@@ -1,17 +1,53 @@
 #!/usr/bin/env node
-const WebSocketServer = require('websocket').server;
-const http = require('http');
 const express = require('express');
 const app = express();
+const http = require('http').Server(app);
+const socket = require('socket.io')(http);
+const PORT = 8000;
 
-// IPアドレスによるアクセス制限
+// IP Filtering
 const ipfilter = require('express-ipfilter').IpFilter;
-const ips = ['131.206.77.23/16'];
-
-app.use(ipfilter(ips, {mode: 'allow'}))
+// const ips = ['::ffff:131.206.77.23/16'];
+const ips = ['::ffff:131.206.77.23'];
+app.use(ipfilter(ips, {mode: 'allow'}));
 module.exports = app;
 
-app.listen(8080, function() {
-    console.log((new Date()) + ' Server is listening on port 8080');
+
+// denied IP
+if (app.get('env') === 'development') {
+  app.use((err, req, res, _next) => {
+    console.log('Error handler', err)
+    if (err instanceof IpDeniedError) {
+      res.status(401)
+    } else {
+      res.status(err.status || 500)
+    }
+ 
+    res.render('error', {
+      message: 'You shall not pass',
+      error: err
+    })
+  })
+
+// Load static files
+app.use('/static', express.static(__dirname + '/public/'));
+
+// Web page
+app.get('/', function(req, res){
+	res.sendFile(__dirname + '/public/index.html');
+});
+
+
+// Socket
+socket.on('connection', function(sock){
+	sock.on('message', function(msg){
+		console.log("message: "+ msg);
+		console.log("sock: "+ sock);
+	});
+});
+
+
+http.listen(PORT, function() {
+    console.log((new Date()) + ' Server is listening on port ' + PORT);
 });
 
