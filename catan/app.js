@@ -5,24 +5,28 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const http = require('http').Server(app);
-const socket = require('socket.io')(http);
+const io = require('socket.io')(http);
 const port = 8000;
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
 // port setting
-app.listen(port);
+// app.listen(port);
+http.listen(port, function(){
+	console.log(console.log((new Date()) + ' Server is listening on port ' + port));
+});
 
 // IP filtering
 const ipfilter = require('express-ipfilter').IpFilter;
 const ipdeniederror = require('express-ipfilter').IpDeniedError;
-const ips  = ['::ffff:131.206.77.23'];
+// const ips  = ['::ffff:131.206.77.23'];
+const ips  = ['::ffff:131.206.77.23/16'];
 app.use(ipfilter(ips, {mode: 'allow'}));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'ejs');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -45,8 +49,8 @@ if (app.get('env') === 'development') {
     }
  
     res.render('error', {
-      // message: 'You shall not pass',
-      error: "Error",
+      message: 'You IP address is no permission'
+      // error: "Error",
     });
   });
 }
@@ -68,3 +72,19 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+
+// socket
+io.on('connection', function(socket){
+	console.log('connected');
+
+	socket.on('message', function(msg){
+		console.log('message: ' + msg);
+		io.to(socket.id).emit('receiveMessage', msg);
+	});
+});
+
+
+
+
+
