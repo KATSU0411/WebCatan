@@ -11,6 +11,11 @@ const port = 8000;
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 
+
+// -----------------------------------------------
+// サーバ立てる準備
+// -----------------------------------------------
+
 // port setting
 // app.listen(port);
 http.listen(port, function(){
@@ -74,6 +79,9 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 
+// -----------------------------------------------
+// ソケット通信テスト
+// -----------------------------------------------
 // socket
 io.on('connection', function(socket){
 	console.log('connected');
@@ -85,6 +93,12 @@ io.on('connection', function(socket){
 });
 
 
+// -----------------------------------------------
+// ここからメイン処理
+// -----------------------------------------------
+let Field[25];	// フィールド情報
+let Grid[];		// マス目情報
+let Side[];		// 辺の情報（街道）
 
 
 
