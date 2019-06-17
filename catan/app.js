@@ -96,9 +96,10 @@ io.on('connection', function(socket){
 // -----------------------------------------------
 // ここからメイン処理
 // -----------------------------------------------
-let Field[25];	// フィールド情報
-let Grid[];		// マス目情報
-let Side[];		// 辺の情報（街道）
+
+const CGame = require('./CGame.js');
+let Game = new CGame();
+
 
 
 
