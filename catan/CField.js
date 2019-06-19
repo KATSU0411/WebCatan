@@ -40,11 +40,16 @@ module.exports = class CField{
 	}
 
 	// user get resource
-	GetResoruce(num){
+	GetResource(num){
 		let ret = [];
+		let count=0;
 		for(let i=0; i<this.num; i++){
 			if(this.number[i] == num && i != this.thief){
-				ret[String(i)] = this.resource[i];
+				ret[count] = {
+					number: i,
+					resource: this.resource[i]
+				};
+				count++;
 			}
 		}
 		return ret;
@@ -59,6 +64,18 @@ module.exports = class CField{
 	// getter
 	get FieldNumber(){
 		return this.num;
+	}
+
+	get Thief(){
+		return this.thief;
+	}
+
+	get Resources(){
+		return this.resource;
+	}
+
+	get Numbers(){
+		return this.number;
 	}
 
 }

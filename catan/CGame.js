@@ -119,17 +119,26 @@ module.exports = class CGame{
 	// 返し値:各ユーザに対して取得する資源データ
 	// ex:ret = {{'t'}{'t','t'}{}{'r','t'}}
 	// ----------------------------
-	GetResoruce(num){
+	GetResource(num){
 		const res = this.Field.GetResource(num);
+		console.log(res);
 		let ret = [];
-		Object.keys(res).forEach(function(key){
-			const val = this[key];
+		for(let i=0; i<4; i++){
+			ret[i] = [];
+		}
+		res.forEach((val) => {
+			const num = val.number;
+			const resource = val.resource;
+			// console.log(num, resource);
+
 			for(let i=0; i<6; i++){
-				const tmp = this.grid[this.FGRlation[parseInt(key)][i]];
+				const index = this.FGRelation[parseInt(num)][i];
+				// console.log(index);
+				const tmp = this.grid[index];
 				if(tmp == 0)continue;
-				ret[tmp].push(val);
+				ret[tmp].push(resource);
 			}
-		}, res);
+		});
 
 		return ret;
 	}
@@ -138,11 +147,27 @@ module.exports = class CGame{
 		return this.Field.FieldNumber;
 	}
 
+	get Grids(){
+		return this.grid;
+	}
+
+	get Roads(){
+		return this.road;
+	}
+
+	get Resources(){
+		return this.Field.Resources;
+	}
+
+	get Numbers(){
+		return this.Field.Numbers;
+	}
+
 	// set methods
 	// true:正常終了
 	// false:異常終了
 	set thief(value){
-		this.Field.thief = value;
+		this.Field.Thief = value;
 		return true;
 	}
 
@@ -155,7 +180,7 @@ module.exports = class CGame{
 
 	SetGrid(index, user){
 		// 隣接箇所に設置されていないか
-		for(let i=0; i<Rnum; i++){
+		for(let i=0; i<this.Rnum; i++){
 			if(this.road[index][i] != -1){
 				if(this.grid[i] != 0) return false;
 			}
@@ -165,7 +190,6 @@ module.exports = class CGame{
 		this.grid[index] = user;
 		return true;
 	}
-
 
 };
 

@@ -100,6 +100,14 @@ io.on('connection', function(socket){
 const CGame = require('./CGame.js');
 let Game = new CGame();
 
+for(let i=0; i<54; i++){
+	Game.SetGrid(i, i%4 + 1);
+}
+
+let dst = Game.GetResource(6);
+console.log(dst);
+
+
 
 
 
