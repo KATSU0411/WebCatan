@@ -121,10 +121,9 @@ module.exports = class CGame{
 	// ----------------------------
 	GetResource(num){
 		const res = this.Field.GetResource(num);
-		console.log(res);
-		let ret = [];
+		let ret = new Array(4);
 		for(let i=0; i<4; i++){
-			ret[i] = [];
+			ret[i] = new Array();
 		}
 		res.forEach((val) => {
 			const num = val.number;
@@ -136,7 +135,7 @@ module.exports = class CGame{
 				// console.log(index);
 				const tmp = this.grid[index];
 				if(tmp == 0)continue;
-				ret[tmp].push(resource);
+				ret[tmp-1].push(resource);
 			}
 		});
 
