@@ -80,32 +80,35 @@ module.exports = app;
 
 
 // -----------------------------------------------
-// ソケット通信テスト
+// ソケット通信（メイン処理）
 // -----------------------------------------------
+const CGame = require('./CGame.js');
+let Game = new CGame(4);
+
+let User = [];
+
 // socket
 io.on('connection', function(socket){
-	console.log('connected');
+	console.log('[connected]', socket.id);
 
 	socket.on('message', function(msg){
 		console.log('message: ' + msg);
 		io.to(socket.id).emit('receiveMessage', msg);
 	});
+
+	// --------------------------
+	// ユーザとIDの紐づけ
+	// --------------------------
+	socket.on('login', function(msg){
+
+	});
 });
 
 
-// -----------------------------------------------
-// ここからメイン処理
-// -----------------------------------------------
 
-const CGame = require('./CGame.js');
-let Game = new CGame();
 
-for(let i=0; i<54; i++){
-	Game.SetGrid(i, i%4 + 1);
-}
 
-let dst = Game.GetResource(6);
-console.log(dst);
+
 
 
 

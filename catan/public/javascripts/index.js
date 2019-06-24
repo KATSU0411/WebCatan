@@ -4,7 +4,8 @@ $(function(){
 	socket = io.connect();
 
 	$('#Btest').on('click', function(){
-		socket.emit('message', 'test');
+		const = $('#userid').value();
+		socket.emit('join', const);
 	});
 	
 

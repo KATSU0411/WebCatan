@@ -1,42 +1,31 @@
 // ----------------------------------
 // ----------------------------------
 const CField = require('./CField.js');
+const CUser = require('./CUser.js');
 module.exports = class CGame{
 
-	// private member variable
-	// private grid: number[] = new Array(54).fill(0);
-	//
-	// // 道のグラフ情報
-	// // -1なら設置不可、0なら設置可、既設置ならユーザID
-	// private road: number[][] = new Array(54);
-	// private const num: number_road=54;
-	//
-	// // 資源フィールドクラス
-	// private Field: CField = new CField();
-	//
-	// // 資源とマス目の関係グラフ
-	// private FGRelation: number[][] = new Array(this.Field.num);
-	//
-	// const Rnum = 54;
-	
-
-	// public member variable
-
-
 	// constructor
-	constructor(){
+	constructor(user){
+		if(user > 4) user = 4;
 		this.grid = new Array(54).fill(0);
 		this.road = new Array(54);
 		this.Field = new CField();
 		this.FGRelation = new Array(this.Fnum);
 		this.Rnum = 54;
+		this.Users = new Array(user);
+		for(let i=0; i<user; i++){
+			this.Users[i] = new CUser();
+		}
 
 		this._RoadInit();
 		this._ResourceInit();
 	}
 
+	// =============================================================
+	// init methods
+	// -------------------------------
 	// 資源用グラフ
-	// ToDo
+	// -------------------------------
 	_ResourceInit(){
 		for(let i=0; i<this.Fnum/2; i++){
 			this.FGRelation[i] = new Array(6).fill(-1);
@@ -63,7 +52,9 @@ module.exports = class CGame{
 		}
 	}
 
-	// グラフ情報初期化
+	// -------------------------------
+	// 街道用グラフ
+	// -------------------------------
 	_RoadInit(){
 		for(let i=0; i<this.Rnum; i++){
 			this.road[i] = new Array(54).fill(-1);
@@ -113,16 +104,17 @@ module.exports = class CGame{
 		this.road[47][46] = -1;
 	}
 
-	// get methods
+
+	// =============================================================
 	// ----------------------------
-	// 指定されたダイス番号が与えられ、どのユーザが資源を獲得するか返す
-	// 返し値:各ユーザに対して取得する資源データ
+	// 指定されたダイス番号が与えられ、各ユーザに資源を与える
+	// 返し値:true
 	// ex:ret = {{'t'}{'t','t'}{}{'r','t'}}
 	// ----------------------------
-	GetResource(num){
+	RollDice(num){
 		const res = this.Field.GetResource(num);
-		let ret = new Array(4);
-		for(let i=0; i<4; i++){
+		let ret = new Array(this.Users.length);
+		for(let i=0; i<this.Users.length; i++){
 			ret[i] = new Array();
 		}
 		res.forEach((val) => {
@@ -139,9 +131,18 @@ module.exports = class CGame{
 			}
 		});
 
-		return ret;
+		for(let i=0; i<this.Users.length; i++){
+			ret[i].forEach(function(val){
+				this.Users[i].AddResource(val);
+			});
+		}
+
+		return true;
+
 	}
 
+	// =============================================================
+	// get methods
 	get Fnum(){
 		return this.Field.FieldNumber;
 	}
@@ -162,6 +163,15 @@ module.exports = class CGame{
 		return this.Field.Numbers;
 	}
 
+	GetUserFlg(user){
+		return this.Users[user].flgPossible;
+	}
+
+	GetResource(user){
+		return this.Users[user].resource;
+	}
+
+	// =============================================================
 	// set methods
 	// true:正常終了
 	// false:異常終了
@@ -171,13 +181,19 @@ module.exports = class CGame{
 	}
 
 	SetRoad(to, from, user){
+		if(user > this.Users.length) return false;
+		if(this.Users[user-1].flgPossible.road === false) return false;
 		if(this.road[to][from] != 0) return false;
+		if(this.grid[to] != user && this.grid[from] != user) return false;
+		this.Users[user-1].CreateRoad();
 		this.road[to][from]= user;
 		this.road[from][to]= user;
 		return true;
 	}
 
-	SetGrid(index, user){
+	SetCamp(index, user){
+		if(user > this.Users.length) return false;
+		if(this.Users[user-1].flgPossible.camp === false) return false;
 		// 隣接箇所に設置されていないか
 		for(let i=0; i<this.Rnum; i++){
 			if(this.road[index][i] != -1){
@@ -186,9 +202,24 @@ module.exports = class CGame{
 		}
 
 		if(this.grid[index] != 0) return false;
+
+		this.Users[user-1].CreateCamp();
 		this.grid[index] = user;
 		return true;
 	}
+
+	UpdateCity(index, user){
+		if(user >= this.Users.length) return false;
+		if(this.Users[user-1].flgPossible.city === false) return false;
+		//そこがそのユーザの開拓地か
+		if(this.grid[index] != user) return false;
+
+		this.Users[user-1].CreateCity();
+		this.grid[index] = 10 + user;
+		
+		return true;
+	}
+	// =============================================================
 
 };
 
