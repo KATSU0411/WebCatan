@@ -86,22 +86,32 @@ const CGame = require('./CGame.js');
 let Game = new CGame(4);
 
 let User = [];
+let us = 1;
 
 // socket
 io.on('connection', function(socket){
 	console.log('[connected]', socket.id);
 
-	socket.on('message', function(msg){
-		console.log('message: ' + msg);
-		io.to(socket.id).emit('receiveMessage', msg);
+	socket.on('disconnect', function(){
+		console.log('[disconnected]', socket.id);
 	});
 
 	// --------------------------
-	// ユーザとIDの紐づけ
+	// ユーザ名とIDの紐づけ
 	// --------------------------
-	socket.on('login', function(msg){
-
+	socket.on('join', function(msg){
+		if(us > 4) return;
+		socket.name = msg;
+		socket.id = us;
+		us++;
 	});
+
+	socket.on('get userid', function(){
+		socket.emit('id', socket.id);
+	});
+
+
+
 });
 
 

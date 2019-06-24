@@ -3,14 +3,19 @@ $(function(){
 	let socket, emit;
 	socket = io.connect();
 
-	$('#Btest').on('click', function(){
-		const = $('#userid').value();
-		socket.emit('join', const);
+	$('#join').on('click', function(){
+		const userid = $('#userid').val();
+		console.log(userid);
+		socket.emit('join', userid);
 	});
 	
 
-	socket.on('receiveMessage', function(msg){
-		console.log('Receive: ' + msg);
+	$('#getid').on('click', function(){
+		socket.emit('get userid');
+	});
+
+	socket.on('id', function(uid){
+		console.log(uid);
 	});
 
 });
