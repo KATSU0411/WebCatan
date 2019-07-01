@@ -79,14 +79,25 @@ app.use(function(err, req, res, next) {
 module.exports = app;
 
 
+// ==========================================================
 // -----------------------------------------------
 // ソケット通信（メイン処理）
 // -----------------------------------------------
 const CGame = require('./CGame.js');
-let Game = new CGame(4);
+let Game;
 
 let User = [];
-let us = 1;
+let us = 0;
+let Turn;
+let Order=[];
+
+function Usr(name){
+	for(let i=0; i<us; i++){
+		if(User[i].name === name)
+			return i;
+	}
+	return -1;
+}
 
 // socket
 io.on('connection', function(socket){
@@ -100,15 +111,97 @@ io.on('connection', function(socket){
 	// ユーザ名とIDの紐づけ
 	// --------------------------
 	socket.on('join', function(msg){
-		if(us > 4) return;
 		socket.name = msg;
-		socket.id = us;
-		us++;
+		if(us >= 4) return;
+		if(Usr(msg) === -1){
+			let u = {name: msg, id: socket.id};
+			User.push(u);
+			Order[us] = us;
+			us++;
+		}
 	});
 
+
+	// --------------------------
+	// getter
+	// --------------------------
 	socket.on('get userid', function(){
-		socket.emit('id', socket.id);
+		socket.emit('id', Usr(socket.name)+1);
 	});
+	socket.on('get resource', function(){
+		socket.emit('resource', Game.GetResource(Usr(socket.name)));
+	});
+
+	// --------------------------
+	// game start
+	// --------------------------
+	socket.on('game start', function(msg){
+		Game = new CGame(us);
+		Turn = 1;
+		for(let i=0; i<50; i++){
+			let ran1 = Math.floor(Math.random() * us);
+			let ran2 = Math.floor(Math.random() * us);
+			let tmp;
+			tmp = Order[ran1];
+			Order[ran1] = Order[ran2];
+			Order[ran2] = tmp;
+		}
+
+		for(let i=0; i<us; i++){
+			User[Order[i]].turn = i+1;
+		}
+		console.log(User);
+		console.log(Order);
+
+		io.emit('game start',{turn: User[Usr(socket.name)].turn});
+		io.to(User[Order[0]].id).emit('your turn');
+	});
+
+	// --------------------------
+	// roll dice
+	// --------------------------
+	let ran1, ran2, sum;
+	socket.on('roll dice', function(msg){
+		if(Turn !== User[(Usr(socket.name))].turn){
+			return;
+		}
+		ran1 = Math.floor(Math.random() * 6) + 1;
+		ran2 = Math.floor(Math.random() * 6) + 1;
+		sum = ran1+ran2;
+		io.emit('result dice', {
+			dice1: ran1,
+			dice2: ran2,
+			sum: sum
+		});
+
+		if(sum === 7){
+			socket.emit('you move thief');
+		}else{
+			const change_rate = Game.RollDice(sum);
+			io.emit('add resource', change_rate[Usr(socket.name)]);
+		}
+	});
+
+	// --------------------------
+	// move thief
+	// --------------------------
+	socket.on('move thief', function(msg){
+		if(Turn !== User[(Usr(socket.name))].turn){
+			return;
+		}
+		Game.thief = msg;
+	});
+	// --------------------------
+	// turn end
+	// --------------------------
+	socket.on('turn end', function(msg){
+		if(Turn !== User[(Usr(socket.name))].turn){
+			return;
+		}
+		Turn = ((Turn)%us) + 1;
+		io.to(User[Order[Turn-1]].id).emit('your turn');
+	});
+
 
 
 

@@ -31,8 +31,9 @@ module.exports = class CUser{
 		this.flgPossible.develop = (this.resource.w >= 1 && this.resource.s >= 1 && this.resource.r >= 1) ? true : false;
 	}
 
-	AddResource(resource){
-		this.resource[resource]++;
+	AddResource(resource, num){
+		if(this.resource[resource] + num < 0) return false;
+		this.resource[resource] += num;
 		this._UpdateFlg();
 	}
 

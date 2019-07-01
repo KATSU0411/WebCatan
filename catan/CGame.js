@@ -108,14 +108,19 @@ module.exports = class CGame{
 	// =============================================================
 	// ----------------------------
 	// 指定されたダイス番号が与えられ、各ユーザに資源を与える
-	// 返し値:true
-	// ex:ret = {{'t'}{'t','t'}{}{'r','t'}}
+	// ex:ret = {{t:1, r:0, w:1, s:0, b:0},{...},{...},{..}}
 	// ----------------------------
 	RollDice(num){
 		const res = this.Field.GetResource(num);
 		let ret = new Array(this.Users.length);
 		for(let i=0; i<this.Users.length; i++){
-			ret[i] = new Array();
+			ret[i] = {
+				t:0,
+				r:0,
+				w:0,
+				s:0,
+				b:0
+			}
 		}
 		res.forEach((val) => {
 			const num = val.number;
@@ -127,17 +132,12 @@ module.exports = class CGame{
 				// console.log(index);
 				const tmp = this.grid[index];
 				if(tmp == 0)continue;
-				ret[tmp-1].push(resource);
+				ret[tmp-1][resource] ++;
+				this.Users[tmp-1].AddResource(resource, 1);
 			}
 		});
 
-		for(let i=0; i<this.Users.length; i++){
-			ret[i].forEach(function(val){
-				this.Users[i].AddResource(val);
-			});
-		}
-
-		return true;
+		return ret;
 
 	}
 
@@ -167,6 +167,10 @@ module.exports = class CGame{
 		return this.Users[user].flgPossible;
 	}
 
+	// return json
+	// {
+	// t: 1, w:2, s:2, b:4, r:1,
+	// }
 	GetResource(user){
 		return this.Users[user].resource;
 	}
