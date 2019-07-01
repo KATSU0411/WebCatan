@@ -163,6 +163,10 @@ module.exports = class CGame{
 		return this.Field.Numbers;
 	}
 
+	get thief(value){
+		return this.Field.Thief;
+	}
+
 	GetUserFlg(user){
 		return this.Users[user].flgPossible;
 	}
@@ -181,7 +185,6 @@ module.exports = class CGame{
 	// false:異常終了
 	set thief(value){
 		this.Field.Thief = value;
-		return true;
 	}
 
 	SetRoad(to, from, user){

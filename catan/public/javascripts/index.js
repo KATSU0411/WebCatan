@@ -85,7 +85,7 @@ $(function(){
 		log('result dice', msg);
 	});
 
-	socket.on('your move thief', function(msg){
-		log('your move thief', msg);
+	socket.on('you move thief', function(msg){
+		log('you move thief', msg);
 	});
 });

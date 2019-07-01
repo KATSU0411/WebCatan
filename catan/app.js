@@ -150,8 +150,6 @@ io.on('connection', function(socket){
 		for(let i=0; i<us; i++){
 			User[Order[i]].turn = i+1;
 		}
-		console.log(User);
-		console.log(Order);
 
 		io.emit('game start',{turn: User[Usr(socket.name)].turn});
 		io.to(User[Order[0]].id).emit('your turn');
