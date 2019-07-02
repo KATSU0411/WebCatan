@@ -53,6 +53,17 @@ $(function(){
 		socket.emit('turn end');
 	});
 
+	$('#SCamp').on('click', function(){
+		const grid = $('#CCamp').val();
+		socket.emit('create camp', grid);
+	});
+
+	$('#SRoad').on('click', function(){
+		const to = $('#CRoadto').val();
+		const from = $('#CRoadfrom').val();
+		socket.emit('create road', {to: to, from: from});
+	});
+
 	// ----------------------------------------
 	// sockets action
 	// ----------------------------------------
@@ -88,4 +99,8 @@ $(function(){
 	socket.on('you move thief', function(msg){
 		log('you move thief', msg);
 	});
+
+	socket.on('error', function(msg){
+		log('Error', msg);
+	}
 });

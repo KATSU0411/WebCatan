@@ -112,7 +112,10 @@ io.on('connection', function(socket){
 	// --------------------------
 	socket.on('join', function(msg){
 		socket.name = msg;
-		if(us >= 4) return;
+		if(us >= 4){
+			socket.emit('error', 'user capacity over');
+			return;
+		} 
 		if(Usr(msg) === -1){
 			let u = {name: msg, id: socket.id};
 			User.push(u);
@@ -161,6 +164,7 @@ io.on('connection', function(socket){
 	let ran1, ran2, sum;
 	socket.on('roll dice', function(msg){
 		if(Turn !== User[(Usr(socket.name))].turn){
+			socket.emit('error', 'not your turn');
 			return;
 		}
 		ran1 = Math.floor(Math.random() * 6) + 1;
@@ -185,10 +189,49 @@ io.on('connection', function(socket){
 	// --------------------------
 	socket.on('move thief', function(msg){
 		if(Turn !== User[(Usr(socket.name))].turn){
+			socket.emit('error', 'not your turn');
 			return;
 		}
 		Game.thief = msg;
 	});
+
+	// --------------------------
+	// create camp
+	// --------------------------
+	socket.on('create camp', function(msg){
+		if(Turn !== User[(Usr(socket.name))].turn){
+			socket.emit('error', 'not your turn');
+			return;
+		}
+
+		let ret = Game.SetCamp(msg, Usr(socket.name));
+		if(ret === false){
+			socket.emit('error', 'cannot create camp');
+			return;
+		}
+
+		io.emit('create camp', {index: msg, user:Usr(socket.name)});
+	});
+
+	// --------------------------
+	// create road
+	// --------------------------
+	socket.on('create road', function(msg){
+		if(Turn !== User[(Usr(socket.name))].turn){
+			socket.emit('error', 'not your turn');
+			return;
+		}
+
+		let ret = Game.SetRoad(msg.to, msg.from, Usr(socket.name));
+		if(ret === false){
+			socket.emit('error', 'cannot create road');
+			return;
+		}
+
+		io.emit('create camp', {index: msg, user:Usr(socket.name)});
+	});
+
+
 	// --------------------------
 	// turn end
 	// --------------------------
@@ -199,9 +242,6 @@ io.on('connection', function(socket){
 		Turn = ((Turn)%us) + 1;
 		io.to(User[Order[Turn-1]].id).emit('your turn');
 	});
-
-
-
 
 });
 

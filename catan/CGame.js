@@ -147,30 +147,42 @@ module.exports = class CGame{
 		return this.Field.FieldNumber;
 	}
 
+	// ---------------------
 	get Grids(){
 		return this.grid;
 	}
 
+	// ---------------------
 	get Roads(){
 		return this.road;
 	}
 
+	// ---------------------
 	get Resources(){
 		return this.Field.Resources;
 	}
 
+	// ---------------------
 	get Numbers(){
 		return this.Field.Numbers;
 	}
 
+	// ---------------------
 	get thief(value){
 		return this.Field.Thief;
 	}
 
+	// ---------------------
 	GetUserFlg(user){
 		return this.Users[user].flgPossible;
 	}
 
+	// ---------------------
+	GetUserPoint(user){
+		return this.Users[user].point;
+	}
+
+	// ---------------------
 	// return json
 	// {
 	// t: 1, w:2, s:2, b:4, r:1,
@@ -187,37 +199,58 @@ module.exports = class CGame{
 		this.Field.Thief = value;
 	}
 
+	// ---------------------
 	SetRoad(to, from, user){
-		if(user > this.Users.length) return false;
+		// index out of bounds check
+		if(user > this.Users.length) return false; 
+		if(to<0 || to>=this.Rnum || from<0 || from>=this.Rnum) return false;
+
+		// user resource check
 		if(this.Users[user-1].flgPossible.road === false) return false;
+
+		// set possible check
 		if(this.road[to][from] != 0) return false;
 		if(this.grid[to] != user && this.grid[from] != user) return false;
+
+		// set
 		this.Users[user-1].CreateRoad();
 		this.road[to][from]= user;
 		this.road[from][to]= user;
 		return true;
 	}
 
+	// ---------------------
 	SetCamp(index, user){
+		// index out of bounds check
 		if(user > this.Users.length) return false;
+		if(index<0 || index>=this.Rnum) return false;
+
+		// user resource check
 		if(this.Users[user-1].flgPossible.camp === false) return false;
-		// 隣接箇所に設置されていないか
+
+		// 既設置と隣接状況の確認
+		if(this.grid[index] != 0) return false;
 		for(let i=0; i<this.Rnum; i++){
 			if(this.road[index][i] != -1){
 				if(this.grid[i] != 0) return false;
 			}
 		}
 
-		if(this.grid[index] != 0) return false;
-
+		// set
 		this.Users[user-1].CreateCamp();
 		this.grid[index] = user;
 		return true;
 	}
 
+	// ---------------------
 	UpdateCity(index, user){
+		// index out of bounds check
 		if(user >= this.Users.length) return false;
+		if(index<0 || index>=this.Rnum) return false;
+
+		// user resource check
 		if(this.Users[user-1].flgPossible.city === false) return false;
+
 		//そこがそのユーザの開拓地か
 		if(this.grid[index] != user) return false;
 
