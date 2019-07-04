@@ -100,6 +100,11 @@ $(function(){
 		log('you move thief', msg);
 	});
 
+	// 初ターンの設置するやつ
+	socket.on('put camp', function(msg){
+
+	});
+
 	socket.on('error', function(msg){
 		log('Error', msg);
 	}

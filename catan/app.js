@@ -90,6 +90,8 @@ let User = [];
 let us = 0;
 let Turn;
 let Order=[];
+let flgFirst = false;
+let flgSecond = false;
 
 function Usr(name){
 	for(let i=0; i<us; i++){
@@ -168,7 +170,47 @@ io.on('connection', function(socket){
 			field: Game.FieldInfo,
 		});
 
-		io.to(User[Order[0]].id).emit('your turn');
+		flgFirst = true;
+		flgSecond = false;
+		io.to(User[Order[0]].id).emit('put camp');
+	});
+
+	// --------------------------
+	// 最初の開拓地置くやつ
+	// --------------------------
+	socket.on('put camp', function(msg){
+		if(Turn !== User[(Usr(socket.name))].turn){
+			socket.emit('error', 'not your turn');
+			return;
+		}
+		if(!flgFirst && !flgSecond) {
+			socket.emit('error', '不正な操作');
+			return;
+		}
+
+		let ret = Game.SetCampWithoutResource(msg, Usr(socket.name));
+		if(ret === false){
+			socket.emit('error', 'cannot create camp');
+			return;
+		}
+
+		if(flgFirst) {
+			if(Turn === us){
+				flgFirst = false;
+				flgSecond = true;
+			}else{
+				Turn++;
+			}
+		}
+		if(flgSecond) {
+			if(Turn === 1){
+				flgSecond = false;
+			}else{
+				Turn--;
+			}
+		}
+
+		io.emit('create camp', {index: msg, user:Usr(socket.name)});
 	});
 
 	// --------------------------
