@@ -229,7 +229,14 @@ module.exports = class CGame{
 
 		// set possible check
 		if(this.road[to][from] != 0) return false;
-		if(this.grid[to] != user && this.grid[from] != user) return false;
+
+		// 隣接して道が設置されているか確認
+		let flg = false;
+		for(let i=0; i<this.Rnum; i++){
+			if (this.road[to][i] === user) flg=true;
+			if (this.road[i][from] === user) flg=true;
+		}
+		if(flg===false && this.grid[to] != user && this.grid[from] != user) return false;
 
 		// set
 		this.road[to][from]= user;
