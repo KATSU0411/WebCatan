@@ -131,8 +131,17 @@ io.on('connection', function(socket){
 	socket.on('get userid', function(){
 		socket.emit('id', Usr(socket.name)+1);
 	});
+
 	socket.on('get resource', function(){
 		socket.emit('resource', Game.GetResource(Usr(socket.name)));
+	});
+
+	socket.on('get FieldInfo', function(){
+		socket.emit('Field Info',{
+			field: Game.FieldInfo,
+			grids: Game.Grids,
+			roads: Game.Roads
+		});
 	});
 
 	// --------------------------
@@ -154,7 +163,11 @@ io.on('connection', function(socket){
 			User[Order[i]].turn = i+1;
 		}
 
-		io.emit('game start',{turn: User[Usr(socket.name)].turn});
+		io.emit('game start',{
+			turn: User[Usr(socket.name)].turn, 
+			field: Game.FieldInfo,
+		});
+
 		io.to(User[Order[0]].id).emit('your turn');
 	});
 

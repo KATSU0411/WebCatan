@@ -147,6 +147,13 @@ module.exports = class CGame{
 		return this.Field.FieldNumber;
 	}
 
+	get FieldInfo(){
+		return {
+			resources: this.Field.Resources,
+			numbers: this.Field.Numbers
+		}
+	}
+
 	// ---------------------
 	get Grids(){
 		return this.grid;
@@ -168,7 +175,7 @@ module.exports = class CGame{
 	}
 
 	// ---------------------
-	get thief(value){
+	get thief(){
 		return this.Field.Thief;
 	}
 
@@ -203,19 +210,31 @@ module.exports = class CGame{
 	SetRoad(to, from, user){
 		// index out of bounds check
 		if(user > this.Users.length) return false; 
-		if(to<0 || to>=this.Rnum || from<0 || from>=this.Rnum) return false;
 
 		// user resource check
 		if(this.Users[user-1].flgPossible.road === false) return false;
+
+		const ret = this.SetRoadWithuotResource(to, from, user);
+		if(ret === false) return false;
+
+		this.Users[user-1].CreateRoad();
+		return true;
+	}
+
+	// ---------------------
+	SetRoadWitoutResource(to, from, user){
+		// index out of bounds check
+		if(user > this.Users.length) return false; 
+		if(to<0 || to>=this.Rnum || from<0 || from>=this.Rnum) return false;
 
 		// set possible check
 		if(this.road[to][from] != 0) return false;
 		if(this.grid[to] != user && this.grid[from] != user) return false;
 
 		// set
-		this.Users[user-1].CreateRoad();
 		this.road[to][from]= user;
 		this.road[from][to]= user;
+
 		return true;
 	}
 
@@ -223,10 +242,22 @@ module.exports = class CGame{
 	SetCamp(index, user){
 		// index out of bounds check
 		if(user > this.Users.length) return false;
-		if(index<0 || index>=this.Rnum) return false;
 
 		// user resource check
 		if(this.Users[user-1].flgPossible.camp === false) return false;
+
+		// set
+		const ret = this.SetCampWithoutResource(index, user);
+		if(ret === false) return false;
+		this.Users[user-1].CreateCamp();
+		return true;
+	}
+
+	// ---------------------
+	SetCampWithoutResource(index, user){
+		// index out of bounds check
+		if(user > this.Users.length) return false;
+		if(index<0 || index>=this.Rnum) return false;
 
 		// 既設置と隣接状況の確認
 		if(this.grid[index] != 0) return false;
@@ -236,9 +267,8 @@ module.exports = class CGame{
 			}
 		}
 
-		// set
-		this.Users[user-1].CreateCamp();
 		this.grid[index] = user;
+
 		return true;
 	}
 
