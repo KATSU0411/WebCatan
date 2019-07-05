@@ -208,7 +208,7 @@ module.exports = class CGame{
 
 	// ---------------------
 	SetRoad(to, from, user){
-		// index out of bounds check
+		// index out of bounds chec
 		if(user > this.Users.length) return false; 
 
 		// user resource check
@@ -223,6 +223,17 @@ module.exports = class CGame{
 
 	// ---------------------
 	SetRoadWitoutResource(to, from, user){
+		const ret = this.SetRoadCheck(to, from, user);
+		if(ret === false) return false;
+		// set
+		this.road[to][from]= user;
+		this.road[from][to]= user;
+
+		return true;
+	}
+
+	// ---------------------
+	SetRoadCheck(to, from, user){
 		// index out of bounds check
 		if(user > this.Users.length) return false; 
 		if(to<0 || to>=this.Rnum || from<0 || from>=this.Rnum) return false;
@@ -237,19 +248,13 @@ module.exports = class CGame{
 			if (this.road[i][from] === user) flg=true;
 		}
 		if(flg===false && this.grid[to] != user && this.grid[from] != user) return false;
-
-		// set
-		this.road[to][from]= user;
-		this.road[from][to]= user;
-
 		return true;
 	}
 
 	// ---------------------
 	SetCamp(index, user){
-		// index out of bounds check
-		if(user > this.Users.length) return false;
-
+		// index out of bounds chec
+		if(user > this.Users.length) return false; 
 		// user resource check
 		if(this.Users[user-1].flgPossible.camp === false) return false;
 
@@ -262,6 +267,16 @@ module.exports = class CGame{
 
 	// ---------------------
 	SetCampWithoutResource(index, user){
+		const ret = this.SetCampCheck(index, user);
+		if(ret === false) return false;
+
+		this.grid[index] = user;
+
+		return true;
+	}
+
+	// -------------------------
+	SetCampCheck(index, user){
 		// index out of bounds check
 		if(user > this.Users.length) return false;
 		if(index<0 || index>=this.Rnum) return false;
@@ -273,9 +288,21 @@ module.exports = class CGame{
 				if(this.grid[i] != 0) return false;
 			}
 		}
+		return true;
+	}
 
-		this.grid[index] = user;
 
+	// ----------------------------
+	// 最初のターンの道と開拓地置くやつ
+	// ----------------------------
+	SetFirstTurn(index, to, from, user){
+		const retC = this.SetCampCheck(index, user);
+		if(retC === false) return false;
+		const retR = this.SetRoadCheck(to, from, user);
+		if(retR === false) return false;
+
+		this.SetCampWithoutResource(index, user);
+		this.SetRoadWithoutResource(to, from, user);
 		return true;
 	}
 

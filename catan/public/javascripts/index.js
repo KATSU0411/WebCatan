@@ -10,6 +10,9 @@ $(function(){
 		s:0,
 		r:0
 	}
+
+	let flgFirst = false;
+
 	socket = io.connect();
 	$('#dice').hide();
 
@@ -64,6 +67,13 @@ $(function(){
 		socket.emit('create road', {to: to, from: from});
 	});
 
+	$('#Set').on('click', function(){
+		const to = $('#CRoadto').val();
+		const from = $('#CRoadfrom').val();
+		const grid = $('#CCamp').val();
+		socket.emit('put camp', {grid:grid, to:to, from:from});
+	});
+
 	// ----------------------------------------
 	// sockets action
 	// ----------------------------------------
@@ -102,7 +112,7 @@ $(function(){
 
 	// 初ターンの設置するやつ
 	socket.on('put camp', function(msg){
-
+		flgFirst = true;
 	});
 
 	socket.on('error', function(msg){

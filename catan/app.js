@@ -188,7 +188,7 @@ io.on('connection', function(socket){
 			return;
 		}
 
-		let ret = Game.SetCampWithoutResource(msg, Usr(socket.name));
+		let ret = Game.SetFirstTurn(msg.grid, msg.to, msg.from, Usr(socket.name));
 		if(ret === false){
 			socket.emit('error', 'cannot create camp');
 			return;
