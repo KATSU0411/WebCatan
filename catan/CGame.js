@@ -224,7 +224,7 @@ module.exports = class CGame{
 	}
 
 	// ---------------------
-	SetRoadWitoutResource(to, from, user){
+	SetRoadWithoutResource(to, from, user){
 		const ret = this.SetRoadCheck(to, from, user);
 		if(ret === false) return false;
 

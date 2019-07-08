@@ -73,8 +73,6 @@ $(function(){
 		const from = $('#CRoadfrom').val();
 		const grid = $('#CCamp').val();
 		socket.emit('put camp', {grid:grid, to:to, from:from});
-		flgFirst = false;
-		$(this).hide();
 	});
 
 	// ----------------------------------------
@@ -92,6 +90,8 @@ $(function(){
 	socket.on('Field Info', function(msg){
 		log('Field',msg);
 	});
+
+
 
 
 	// ----------------------------------------
@@ -112,16 +112,17 @@ $(function(){
 
 	socket.on('add resource', function(msg){
 		log('add resource', msg);
-		resource.t += msg.t;
-		resource.r += msg.r;
-		resource.b += msg.b;
-		resource.s += msg.s;
-		resource.w += msg.w;
+		resources.t += msg.t;
+		resources.r += msg.r;
+		resources.b += msg.b;
+		resources.s += msg.s;
+		resources.w += msg.w;
 		RShow();
 	});
 
 	socket.on('result dice', function(msg){
 		log('result dice', msg);
+		socket.emit('resource get');
 	});
 
 	socket.on('you move thief', function(msg){
@@ -137,4 +138,25 @@ $(function(){
 	socket.on('myerror', function(msg){
 		log('Error', msg);
 	});
+
+	// ---------------------------------------
+	// other user announce
+	// ---------------------------------------
+	socket.on('create camp', function(msg){
+		console.log(msg);
+		if(flgFirst){
+			flgFirst = false;
+			$('#Set').hide();
+		}
+	});
+
+	socket.on('update city', function(msg){
+		console.log(msg);
+	});
+
+	socket.on('create road', function(msg){
+		console.log(msg);
+	});
+	
+
 });

@@ -197,6 +197,9 @@ io.on('connection', function(socket){
 			return;
 		}
 
+		io.emit('create camp', {index: msg.grid, user:Usr(socket.name)});
+		io.emit('create road', {to: msg.to, from:msg.from, user:Usr(socket.name)});
+
 		if(flgFirst) {
 			if(Turn === us){
 				flgFirst = false;
@@ -205,21 +208,23 @@ io.on('connection', function(socket){
 				Turn++;
 			}
 		}
-		if(flgSecond) {
+		else if(flgSecond) {
 			if(Turn === 1){
 				flgSecond = false;
+				io.to(User[Order[Turn-1]].id).emit('your turn');
+				return;
 			}else{
 				Turn--;
 			}
 		}
-
-		io.emit('create camp', {index: msg, user:Usr(socket.name)});
+		io.to(User[Order[Turn-1]].id).emit('put camp');
 	});
 
 	// --------------------------
 	// roll dice
 	// --------------------------
 	let ran1, ran2, sum;
+	let change_rate;
 	socket.on('roll dice', function(msg){
 		if(Turn !== User[(Usr(socket.name))].turn){
 			socket.emit('myerror', 'not your turn');
@@ -238,9 +243,13 @@ io.on('connection', function(socket){
 			socket.emit('you move thief');
 			Game.flgThief = true;
 		}else{
-			const change_rate = Game.RollDice(sum);
-			io.emit('add resource', change_rate[Usr(socket.name)]);
+			change_rate = Game.RollDice(sum);
+			// io.emit('add resource', change_rate[Usr(socket.name)]);
 		}
+	});
+
+	socket.on('resource get', function(msg){
+		io.emit('add resource', change_rate[Usr(socket.name)]);
 	});
 
 	// --------------------------
