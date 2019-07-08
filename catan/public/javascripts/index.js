@@ -15,6 +15,7 @@ $(function(){
 
 	socket = io.connect();
 	$('#dice').hide();
+	$('#Set').hide();
 
 	// show update
 	function RShow(){
@@ -72,19 +73,36 @@ $(function(){
 		const from = $('#CRoadfrom').val();
 		const grid = $('#CCamp').val();
 		socket.emit('put camp', {grid:grid, to:to, from:from});
+		flgFirst = false;
+		$(this).hide();
 	});
 
 	// ----------------------------------------
-	// sockets action
+	// get action
 	// ----------------------------------------
 	socket.on('id', function(uid){
 		log('id',uid);
 		userid = uid;
 	});
 
+	socket.on('turn', function(msg){
+		log('turn',msg);
+		turn = msg;
+	});
+	socket.on('Field Info', function(msg){
+		log('Field',msg);
+	});
+
+
+	// ----------------------------------------
+	// sockets action
+	// ----------------------------------------
+
 	socket.on('game start', function(msg){
 		log('game start', msg);
-		turn = msg.turn;
+		// turn = msg.turn;
+		socket.emit('get FieldInfo');
+		socket.emit('get turn');
 	});
 
 	socket.on('your turn', function(msg){
@@ -113,9 +131,10 @@ $(function(){
 	// 初ターンの設置するやつ
 	socket.on('put camp', function(msg){
 		flgFirst = true;
+		$('#Set').show();
 	});
 
-	socket.on('error', function(msg){
+	socket.on('myerror', function(msg){
 		log('Error', msg);
-	}
+	});
 });
