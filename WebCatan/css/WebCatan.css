@@ -1,0 +1,27 @@
+.mainWrapper {
+	position: relative;
+	/* background-color: yellow; */
+	/* width: 100%; */
+	border: 1px solid;
+}
+
+.hexagon {
+	stroke: white;
+	stroke-width: 1.5px;
+}
+
+/* .mainWrapper:before {      */
+/* 	content: "";              */
+/* 	display: block;           */
+/* 	padding-top: 56.25%;      */
+/* }                          */
+
+/* .GameBoardWrapper {        */
+/* 	position: absolute;       */
+/* 	top: 0;                   */
+/* 	left: 0;                  */
+/* 	bottom: 0;                */
+/* 	right: 0;                 */
+/* 	background-color: yellow; */
+/* }                          */
+
