@@ -119,6 +119,7 @@ io.on('connection', function(socket){
 			Order[us] = us;
 			us++;
 		}
+		socket.emit('join success', Usr(socket.name)+1);
 	});
 
 

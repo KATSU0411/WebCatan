@@ -88,4 +88,8 @@ $(function(){
 	socket.on('you move thief', function(msg){
 		log('you move thief', msg);
 	});
+
+	socket.on('join success', function(msg){
+		log('join success', msg);
+	});
 });
