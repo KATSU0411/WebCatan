@@ -10,8 +10,12 @@ $(function(){
 		s:0,
 		r:0
 	}
+
+	let flgFirst = false;
+
 	socket = io.connect();
 	$('#dice').hide();
+	$('#Set').hide();
 
 	// show update
 	function RShow(){
@@ -53,17 +57,52 @@ $(function(){
 		socket.emit('turn end');
 	});
 
+	$('#SCamp').on('click', function(){
+		const grid = $('#CCamp').val();
+		socket.emit('create camp', grid);
+	});
+
+	$('#SRoad').on('click', function(){
+		const to = $('#CRoadto').val();
+		const from = $('#CRoadfrom').val();
+		socket.emit('create road', {to: to, from: from});
+	});
+
+	$('#Set').on('click', function(){
+		const to = $('#CRoadto').val();
+		const from = $('#CRoadfrom').val();
+		const grid = $('#CCamp').val();
+		socket.emit('put camp', {grid:grid, to:to, from:from});
+	});
+
 	// ----------------------------------------
-	// sockets action
+	// get action
 	// ----------------------------------------
 	socket.on('id', function(uid){
 		log('id',uid);
 		userid = uid;
 	});
 
+	socket.on('turn', function(msg){
+		log('turn',msg);
+		turn = msg;
+	});
+	socket.on('Field Info', function(msg){
+		log('Field',msg);
+	});
+
+
+
+
+	// ----------------------------------------
+	// sockets action
+	// ----------------------------------------
+
 	socket.on('game start', function(msg){
 		log('game start', msg);
-		turn = msg.turn;
+		// turn = msg.turn;
+		socket.emit('get FieldInfo');
+		socket.emit('get turn');
 	});
 
 	socket.on('your turn', function(msg){
@@ -73,23 +112,57 @@ $(function(){
 
 	socket.on('add resource', function(msg){
 		log('add resource', msg);
-		resource.t += msg.t;
-		resource.r += msg.r;
-		resource.b += msg.b;
-		resource.s += msg.s;
-		resource.w += msg.w;
+		resources.t += msg.t;
+		resources.r += msg.r;
+		resources.b += msg.b;
+		resources.s += msg.s;
+		resources.w += msg.w;
 		RShow();
 	});
 
 	socket.on('result dice', function(msg){
 		log('result dice', msg);
+		socket.emit('resource get');
 	});
 
 	socket.on('you move thief', function(msg){
 		log('you move thief', msg);
 	});
 
+<<<<<<< HEAD
 	socket.on('join success', function(msg){
 		log('join success', msg);
 	});
+=======
+	// 初ターンの設置するやつ
+	socket.on('put camp', function(msg){
+		flgFirst = true;
+		$('#Set').show();
+	});
+
+	socket.on('myerror', function(msg){
+		log('Error', msg);
+	});
+
+	// ---------------------------------------
+	// other user announce
+	// ---------------------------------------
+	socket.on('create camp', function(msg){
+		console.log(msg);
+		if(flgFirst){
+			flgFirst = false;
+			$('#Set').hide();
+		}
+	});
+
+	socket.on('update city', function(msg){
+		console.log(msg);
+	});
+
+	socket.on('create road', function(msg){
+		console.log(msg);
+	});
+	
+
+>>>>>>> master
 });

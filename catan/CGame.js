@@ -13,6 +13,7 @@ module.exports = class CGame{
 		this.FGRelation = new Array(this.Fnum);
 		this.Rnum = 54;
 		this.Users = new Array(user);
+		this.flgThief = false;
 		for(let i=0; i<user; i++){
 			this.Users[i] = new CUser();
 		}
@@ -147,30 +148,49 @@ module.exports = class CGame{
 		return this.Field.FieldNumber;
 	}
 
+	get FieldInfo(){
+		return {
+			resources: this.Field.Resources,
+			numbers: this.Field.Numbers
+		}
+	}
+
+	// ---------------------
 	get Grids(){
 		return this.grid;
 	}
 
+	// ---------------------
 	get Roads(){
 		return this.road;
 	}
 
+	// ---------------------
 	get Resources(){
 		return this.Field.Resources;
 	}
 
+	// ---------------------
 	get Numbers(){
 		return this.Field.Numbers;
 	}
 
-	get thief(value){
+	// ---------------------
+	get thief(){
 		return this.Field.Thief;
 	}
 
+	// ---------------------
 	GetUserFlg(user){
 		return this.Users[user].flgPossible;
 	}
 
+	// ---------------------
+	GetUserPoint(user){
+		return this.Users[user].point;
+	}
+
+	// ---------------------
 	// return json
 	// {
 	// t: 1, w:2, s:2, b:4, r:1,
@@ -184,45 +204,134 @@ module.exports = class CGame{
 	// true:正常終了
 	// false:異常終了
 	set thief(value){
+		if(this.flgThief === false) return;
 		this.Field.Thief = value;
 	}
 
+	// ---------------------
 	SetRoad(to, from, user){
-		if(user > this.Users.length) return false;
-		if(this.Users[user-1].flgPossible.road === false) return false;
-		if(this.road[to][from] != 0) return false;
-		if(this.grid[to] != user && this.grid[from] != user) return false;
-		this.Users[user-1].CreateRoad();
-		this.road[to][from]= user;
-		this.road[from][to]= user;
+		// index out of bounds chec
+		if(user >= this.Users.length && user < 0) return false;
+
+		// user resource check
+		if(this.Users[user].flgPossible.road === false) return false;
+
+		const ret = this.SetRoadWithuotResource(to, from, user);
+		if(ret === false) return false;
+
+		this.Users[user].CreateRoad();
 		return true;
 	}
 
+	// ---------------------
+	SetRoadWithoutResource(to, from, user){
+		const ret = this.SetRoadCheck(to, from, user);
+		if(ret === false) return false;
+
+		// set
+		this.road[to][from]= user+1;
+		this.road[from][to]= user+1;
+
+		return true;
+	}
+
+	// ---------------------
+	SetRoadCheck(to, from, user){
+		// index out of bounds check
+		if(user >= this.Users.length && user < 0) return false;
+		if(to<0 || to>=this.Rnum || from<0 || from>=this.Rnum) return false;
+
+		// set possible check
+		if(this.road[to][from] != 0) return false;
+
+		// 隣接して道が設置されているか確認
+		let flg = false;
+		for(let i=0; i<this.Rnum; i++){
+			if (this.road[to][i] === user+1) flg=true;
+			if (this.road[i][from] === user+1) flg=true;
+		}
+		if(flg===false && this.grid[to] != user+1 && this.grid[from] != user+1) return false;
+		return true;
+	}
+
+	// ---------------------
 	SetCamp(index, user){
-		if(user > this.Users.length) return false;
-		if(this.Users[user-1].flgPossible.camp === false) return false;
-		// 隣接箇所に設置されていないか
+		// index out of bounds check
+		if(user >= this.Users.length && user < 0) return false;
+		// user resource check
+		if(this.Users[user].flgPossible.camp === false) return false;
+
+		// set
+		const ret = this.SetCampWithoutResource(index, user);
+		if(ret === false) return false;
+		this.Users[user].CreateCamp();
+		return true;
+	}
+
+	// ---------------------
+	RemoveCamp(index){
+		if(index<0 || index>=this.Rnum) return false;
+		this.grid[index] = 0;
+		return true;
+	}
+
+
+	// ---------------------
+	SetCampWithoutResource(index, user){
+		const ret = this.SetCampCheck(index, user);
+		if(ret === false) return false;
+
+		this.grid[index] = user+1;
+
+		return true;
+	}
+
+	// -------------------------
+	SetCampCheck(index, user){
+		// index out of bounds check
+		if(user >= this.Users.length && user < 0) return false;
+		if(index<0 || index>=this.Rnum) return false;
+
+		// 既設置と隣接状況の確認
+		if(this.grid[index] != 0) return false;
 		for(let i=0; i<this.Rnum; i++){
 			if(this.road[index][i] != -1){
 				if(this.grid[i] != 0) return false;
 			}
 		}
-
-		if(this.grid[index] != 0) return false;
-
-		this.Users[user-1].CreateCamp();
-		this.grid[index] = user;
 		return true;
 	}
 
-	UpdateCity(index, user){
-		if(user >= this.Users.length) return false;
-		if(this.Users[user-1].flgPossible.city === false) return false;
-		//そこがそのユーザの開拓地か
-		if(this.grid[index] != user) return false;
 
-		this.Users[user-1].CreateCity();
-		this.grid[index] = 10 + user;
+	// ----------------------------
+	// 最初のターンの道と開拓地置くやつ
+	// ----------------------------
+	SetFirstTurn(index, to, from, user){
+		let r;
+		r = this.SetCampWithoutResource(index, user);
+		if(r === false) return false;
+		r = this.SetRoadWithoutResource(to, from, user);
+		if(r === false){
+			this.RemoveCamp(index);
+			return false;
+		}
+		return true;
+	}
+
+	// ---------------------
+	UpdateCity(index, user){
+		// index out of bounds check
+		if(user >= this.Users.length && user < 0) return false;
+		if(index<0 || index>=this.Rnum) return false;
+
+		// user resource check
+		if(this.Users[user].flgPossible.city === false) return false;
+
+		//そこがそのユーザの開拓地か
+		if(this.grid[index] != user+1) return false;
+
+		this.Users[user].CreateCity();
+		this.grid[index] = 10 + user+1;
 		
 		return true;
 	}
