@@ -1,30 +1,8 @@
-$(function(){
+function FieldDraw(msg){
 
 	//画面サイズ取得
 	var length = $("#mainWrapper>svg").width();
-
-	// // json受け取り
-	// socket.on('ivent',function(msg){
-	// 	CreateFiled(msg);
-	// });
 	
-	var msg = {
-		resources: [
-			't', 't', 's',
-			'b', 'w', 's',
-			't', 'r', 's',
-			'w', 'w', 'b',
-			'b', 'r', 'w',
-			't', 'r', 's'
-		],
-		numbers: [
-			9, 11,  3,  9,
-			12, 10, 10, 11,
-			4,  8,  6,  2,
-			8,  5,  3,  5,
-			4,  6
-		]
-	}
 
 	var svg = d3.select("#mainWrapper>svg")
 		.append("g");
@@ -39,6 +17,8 @@ $(function(){
 
 	//フィールド描画
 	var field = svg.append("g");
+
+	console.log(length);
 
 	field.attr("class", "hexagon")
 		.selectAll("path")
@@ -56,6 +36,9 @@ $(function(){
 		.attr("transform", function(d){
 			return "translate(" + d.x + "," + d.y + ")";
 		})
+		.attr("id", function(d,i){
+			return "field" + i;
+		});
 
 	//フィールドの数字配置場所（ごり押し）
 	var circle = [
@@ -85,34 +68,30 @@ $(function(){
 	]
 
 	//数字の円描画
-	field.selectAll('circle')
+	let dst = field.selectAll('circle')
 		.data(circle)
 		.enter()
 		.append('circle')
 		.attr('transform', function(d,i){
 			return "translate(" + d[0] + "," + d[1] + ")";
 		})
-		.attr({
-			'r': radius/2,
-			'fill': '#f0f88c'
-		});
+		.attr("r", radius/2)
+		.attr("fill", '#f0f88c');
 
 	//数字描画
 	field.selectAll('text')
 		.data(circle)
 		.enter()
 		.append('text')
-			.attr({
-				'text-anchor': "middle",
-				'font-size': "80px",
-				'dy': ".35em",
-				'fill': "black"
-			})
 		.attr('transform', function(d,i){
 			return "translate(" + d[0] + "," + d[1] + ")";
 		})
-		.text(function(d,i) { return msg.numbers[i]; });
-});
+		.text(function(d,i) { return msg.numbers[i]; })
+		.attr('text-anchor', "middle")
+		.attr('font-size', "80px")
+		.attr('dy', ".35em")
+		.attr('fill', "black");
+}
 
 function setField(radius, length) {
 

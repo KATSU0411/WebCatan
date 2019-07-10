@@ -4,30 +4,61 @@
 	<meta charset="UTF-8">
 	<title>WebCatan</title>
 
-	<link rel="stylesheet" href="/WebCatan/css/WebCatan.css">
-	<!-- BootStrap読み込み -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+	<link rel="stylesheet" href="/stylesheets/WebCatan.css">
 
 	<!-- JQuery読み込み -->
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script type="text/javascript" src="/javascripts/jquery-3.4.1.min.js"></script>
+
+	<!-- BootStrap読み込み -->
+	<link rel="stylesheet" href="/stylesheets/bootstrap.css">
+	<script type="text/javascript" src="/javascripts/bootstrap.js"></script>
+
 
 	<!-- D3.js読み込み -->
-	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	<script src="http://d3js.org/d3.hexbin.v0.min.js" charset="utf-8"></script>
+	<script type="text/javascript" src="/javascripts/d3.js"></script>
+	<script type="text/javascript" src="/javascripts/d3-hexbin.v0.2.min.js"></script>
 
 	<!-- 各種jsファイル読み込み -->
-	<script type="text/javascript" src="/WebCatan/js/WebCatan.js"></script>
+	<script text="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script type="text/javascript" src="/javascripts/FieldDraw.js"></script>
+	<script type="text/javascript" src="/javascripts/WebCatan.js"></script>
 
 
 </head>
 <body>
+	<input id="username" type="text">
+	<button id="join">join</button>
+	<button id="getid">getid</button>
+	<button id="start">start</button>
+	<br>
+	<button id="dice" class="dice">Roll Dice</button>
+	<button id="end">Turn End</button>
+	<br>
+	<input type="number" id="CCamp">
+	<button id="SCamp">Create Camp</button>
+	<br>
+	<input type="number" id="CCity">
+	<button id="SCity">Update City</button>
+	<br>
+	<input type="number" id="CRoadto">
+	<input type="number" id="CRoadfrom">
+	<button id="SRoad">Create Road</button>
+	<br>
+	<button id="Set">Set</button>
+	<br>
+	<div>
+		resources:<br>
+		<div id="t">t:0</div>
+		<div id="r">r:0</div>
+		<div id="w">w:0</div>
+		<div id="s">s:0</div>
+		<div id="b">b:0</div>
+	</div><br>
+
 	<div id="mainWrapper"></div>
 
 	<div id="MyGraph">
 	</div>
 
-	<!-- 各種JSファイル(d3.js関連)読み込み -->
-	<script type="text/javascript" src="/WebCatan/js/FieldDraw.js"></script>
-	<script type="text/javascript" src="/WebCatan/js/Building.js"></script>
 </body>
 </html>
