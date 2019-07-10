@@ -122,18 +122,18 @@ $(function(){
 
 	socket.on('result dice', function(msg){
 		log('result dice', msg);
-		socket.emit('resource get');
+		socket.emit('resource add');
 	});
 
 	socket.on('you move thief', function(msg){
 		log('you move thief', msg);
 	});
 
-<<<<<<< HEAD
 	socket.on('join success', function(msg){
 		log('join success', msg);
+		$('#join').hide();
 	});
-=======
+
 	// 初ターンの設置するやつ
 	socket.on('put camp', function(msg){
 		flgFirst = true;
@@ -162,7 +162,5 @@ $(function(){
 	socket.on('create road', function(msg){
 		console.log(msg);
 	});
-	
 
->>>>>>> master
 });

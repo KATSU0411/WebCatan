@@ -249,7 +249,7 @@ io.on('connection', function(socket){
 		}
 	});
 
-	socket.on('resource get', function(msg){
+	socket.on('resource add', function(msg){
 		io.emit('add resource', change_rate[Usr(socket.name)]);
 	});
 
