@@ -21,6 +21,7 @@
 	<!-- 各種jsファイル読み込み -->
 	<script text="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="/javascripts/FieldDraw.js"></script>
+	<script type="text/javascript" src="/javascripts/Building.js"></script>
 	<script type="text/javascript" src="/javascripts/WebCatan.js"></script>
 
 
@@ -34,17 +35,20 @@
 	<button id="dice" class="dice">Roll Dice</button>
 	<button id="end">Turn End</button>
 	<br>
-	<input type="number" id="CCamp">
-	<button id="SCamp">Create Camp</button>
-	<br>
-	<input type="number" id="CCity">
-	<button id="SCity">Update City</button>
-	<br>
-	<input type="number" id="CRoadto">
-	<input type="number" id="CRoadfrom">
-	<button id="SRoad">Create Road</button>
-	<br>
-	<button id="Set">Set</button>
+	<!-- <input type="number" id="CCamp"> -->
+	<!-- <button id="SCamp">Create Camp</button> -->
+	<!-- <br> -->
+	<!-- <input type="number" id="CCity"> -->
+	<!-- <button id="SCity">Update City</button> -->
+	<!-- <br> -->
+	<!-- <input type="number" id="CRoadto"> -->
+	<!-- <input type="number" id="CRoadfrom"> -->
+	<!-- <button id="SRoad">Create Road</button> -->
+	<!-- <br> -->
+	<input type="radio" name="ex" value="camp">Create Camp
+	<input type="radio" name="ex" value="city">Update City
+	<input type="radio" name="ex" value="road">Create Road
+	<button id="Set">Submit</button>
 	<br>
 	<div>
 		resources:<br>
@@ -56,8 +60,6 @@
 	</div><br>
 
 	<div id="mainWrapper"></div>
-
-	<div id="MyGraph">
 	</div>
 
 </body>

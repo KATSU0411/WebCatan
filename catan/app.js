@@ -225,7 +225,7 @@ io.on('connection', function(socket){
 	// roll dice
 	// --------------------------
 	let ran1, ran2, sum;
-	let change_rate;
+	let change_rate = [];
 	socket.on('roll dice', function(msg){
 		if(Turn !== User[(Usr(socket.name))].turn){
 			socket.emit('myerror', 'not your turn');
@@ -245,12 +245,13 @@ io.on('connection', function(socket){
 			Game.flgThief = true;
 		}else{
 			change_rate = Game.RollDice(sum);
+			console.log(change_rate);
 			// io.emit('add resource', change_rate[Usr(socket.name)]);
 		}
 	});
 
 	socket.on('resource add', function(msg){
-		io.emit('add resource', change_rate[Usr(socket.name)]);
+		socket.emit('add resource', change_rate[(Usr(socket.name))]);
 	});
 
 	// --------------------------
@@ -299,7 +300,6 @@ io.on('connection', function(socket){
 		}
 
 		io.emit('update city', {index: msg, user:Usr(socket.name)});
-		io.to(User[Order[Turn-1]].id).emit('put camp');
 	});
 
 	// --------------------------

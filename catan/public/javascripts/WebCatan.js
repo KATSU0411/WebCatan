@@ -42,8 +42,19 @@ $(function(){
 		s:0,
 		r:0
 	}
+	let camp;
+	let road = {
+		to:0,
+		from:0,
+	};
 
 	let flgFirst = false;
+	let flg = {
+		roadto:false,
+		roadfrom: false,
+		camp: false,
+		city: false
+	};
 
 	socket = io.connect();
 	$('#dice').hide();
@@ -87,6 +98,7 @@ $(function(){
 
 	$('#end').on('click', function(){
 		socket.emit('turn end');
+		$('#Set').hide();
 	});
 
 	$('#SCamp').on('click', function(){
@@ -101,10 +113,19 @@ $(function(){
 	});
 
 	$('#Set').on('click', function(){
-		const to = $('#CRoadto').val();
-		const from = $('#CRoadfrom').val();
-		const grid = $('#CCamp').val();
-		socket.emit('put camp', {grid:grid, to:to, from:from});
+		console.log(flg);
+		console.log(flgFirst);
+		console.log(camp);
+		console.log(road);
+		if(flgFirst){
+			socket.emit('put camp', {grid:camp, to:road.to, from:road.from});
+		}else if(flg.camp){
+			socket.emit('create camp', camp);
+		}else if(flg.city){
+			socket.emit('update city', camp);
+		}else if(flg.roadfrom){
+			socket.emit('create road', {to: road.to, from: road.from});
+		}
 	});
 
 	// ----------------------------------------
@@ -142,6 +163,7 @@ $(function(){
 	socket.on('your turn', function(msg){
 		log('your turn', msg);
 		$('#dice').show();
+		$('#Set').show();
 	});
 
 	socket.on('add resource', function(msg){
@@ -165,6 +187,7 @@ $(function(){
 
 	socket.on('join success', function(msg){
 		log('join success', msg);
+		userid = msg;
 		$('#join').hide();
 	});
 
@@ -175,6 +198,7 @@ $(function(){
 	});
 
 	socket.on('myerror', function(msg){
+		console.log('error');
 		log('Error', msg);
 	});
 
@@ -187,14 +211,93 @@ $(function(){
 			flgFirst = false;
 			$('#Set').hide();
 		}
+
+		const target = $('[townID = ' + msg.index + ']');
+		town[msg.index] = msg.user;
+		changeColor(target, msg.user);
 	});
 
 	socket.on('update city', function(msg){
 		console.log(msg);
+		const city = $('[cityID = ' + msg.index + ']');
+		const target = $('[townID = ' + msg.index + ']');
+		
+		town[msg.index] = (msg.user + 10);
+		target.remove();
+		changeColor(city, msg.user);
 	});
 
 	socket.on('create road', function(msg){
 		console.log(msg);
+	});
+
+
+	//======================================================
+	//	開拓地・都市建設
+	//------------------------------------------------------
+	//	描画順より、開拓地(circle)の方が前面にきている(そうしている)ため
+	//	circleクリック時に動作するようにしている
+	//======================================================
+	//開拓地建設状況
+	var town = [
+		 0, 0, 0, 0, 0, 0, 0, 0,
+		 0, 0, 0, 0, 0, 0, 0, 0,
+		 0, 0, 0, 0, 0, 0, 0, 0,
+		 0, 0, 0, 0, 0, 0, 0, 0,
+		 0, 0, 0, 0, 0, 0, 0, 0,
+		 0, 0, 0, 0, 0, 0, 0, 0,
+		 0, 0, 0, 0, 0, 0
+	];
+
+	$(document).on('click', ".towns>circle", function(){
+		let target = $(event.target);
+		const grid = target.attr("townID");
+
+		if(flg.camp){
+			//開拓地建てる
+			if(town[grid] === 0){
+				// socket.emit('create camp', grid);
+				camp = grid;
+				console.log('camp:' + camp);
+			}
+		}else if(flg.city){
+			//都市にアップグレード
+			if(town[target.attr("townID")] == user){
+				// socket.emit('update city', grid);
+				camp = grid;
+				console.log('camp:' + camp);
+			}
+		}else if(flg.roadto){
+			road.to = grid;
+			flg.roadto = false;
+			flg.roadfrom = true;
+			console.log('roadto:' + road.to);
+		}else if(flg.roadfrom){
+			road.from = grid;
+			console.log('roadfrom:' + road.from);
+		}
+	});
+
+	$('input[name=ex]:radio').on('change', function(){
+		const val = $(this).val();
+		console.log(val);
+		if(val === "camp") {
+			flg.camp=true;
+			flg.roadto=false;
+			flg.roadfrom=false;
+			flg.city=false;
+		}else if(val === 'city'){
+			flg.camp=false;
+			flg.roadto=false;
+			flg.roadfrom=false;
+			flg.city=true;
+		}else if(val === 'road'){
+			flg.camp=false;
+			flg.roadto=true;
+			flg.roadfrom=false;
+			flg.city=false;
+		}
+
 	});
 
 });

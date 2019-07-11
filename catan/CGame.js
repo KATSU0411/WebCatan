@@ -126,7 +126,6 @@ module.exports = class CGame{
 		res.forEach((val) => {
 			const num = val.number;
 			const resource = val.resource;
-			// console.log(num, resource);
 
 			for(let i=0; i<6; i++){
 				const index = this.FGRelation[parseInt(num)][i];
@@ -260,6 +259,15 @@ module.exports = class CGame{
 		if(user >= this.Users.length && user < 0) return false;
 		// user resource check
 		if(this.Users[user].flgPossible.camp === false) return false;
+
+		let flg=false;
+
+		for(let i=0; i<this.Rnum; i++){
+			if(this.road[index][i] === user+1){
+				flg=true;
+			}
+		}
+		if(flg === false)return false;
 
 		// set
 		const ret = this.SetCampWithoutResource(index, user);
