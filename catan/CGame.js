@@ -215,7 +215,7 @@ module.exports = class CGame{
 		// user resource check
 		if(this.Users[user].flgPossible.road === false) return false;
 
-		const ret = this.SetRoadWithuotResource(to, from, user);
+		const ret = this.SetRoadWithoutResource(to, from, user);
 		if(ret === false) return false;
 
 		this.Users[user].CreateRoad();

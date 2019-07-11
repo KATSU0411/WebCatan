@@ -157,7 +157,7 @@ $(function(){
 		// turn = msg.turn;
 		$('#start').hide();
 		socket.emit('get FieldInfo');
-		socket.emit('get turn');
+		// socket.emit('get turn');
 	});
 
 	socket.on('your turn', function(msg){
@@ -178,7 +178,7 @@ $(function(){
 
 	socket.on('result dice', function(msg){
 		log('result dice', msg);
-		socket.emit('resource add');
+		if(msg.sum !== 7) socket.emit('resource add');
 	});
 
 	socket.on('you move thief', function(msg){

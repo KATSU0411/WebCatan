@@ -92,6 +92,7 @@ let Turn;
 let Order=[];
 let flgFirst = false;
 let flgSecond = false;
+let change_rate = [];
 
 function Usr(name){
 	for(let i=0; i<us; i++){
@@ -119,7 +120,11 @@ io.on('connection', function(socket){
 			return;
 		} 
 		if(Usr(msg) === -1){
-			let u = {name: msg, id: socket.id};
+			let u = {
+				name: msg, 
+				id: socket.id
+				};
+			console.log(u);
 			User.push(u);
 			Order[us] = us;
 			us++;
@@ -139,11 +144,11 @@ io.on('connection', function(socket){
 		socket.emit('resource', Game.GetResource(Usr(socket.name)));
 	});
 
-	socket.on('get turn', function(){
-		socket.emit('turn',{
-			turn: User[Usr(socket.name)].turn,
-		});
-	});
+	// socket.on('get turn', function(){
+	// 	socket.emit('turn',{
+	// 		turn: User[Usr(socket.name)].turn
+	// 	});
+	// });
 
 	socket.on('get FieldInfo', function(){
 		socket.emit('Field Info',{
@@ -225,7 +230,6 @@ io.on('connection', function(socket){
 	// roll dice
 	// --------------------------
 	let ran1, ran2, sum;
-	let change_rate = [];
 	socket.on('roll dice', function(msg){
 		if(Turn !== User[(Usr(socket.name))].turn){
 			socket.emit('myerror', 'not your turn');
@@ -234,24 +238,31 @@ io.on('connection', function(socket){
 		ran1 = Math.floor(Math.random() * 6) + 1;
 		ran2 = Math.floor(Math.random() * 6) + 1;
 		sum = ran1+ran2;
-		io.emit('result dice', {
-			dice1: ran1,
-			dice2: ran2,
-			sum: sum
-		});
 
 		if(sum === 7){
 			socket.emit('you move thief');
 			Game.flgThief = true;
 		}else{
-			change_rate = Game.RollDice(sum);
+			const r = Game.RollDice(sum);
+			change_rate[0] = r[0];
+			change_rate[1] = r[1];
+			change_rate[2] = r[2];
+			change_rate[3] = r[3];
 			console.log(change_rate);
 			// io.emit('add resource', change_rate[Usr(socket.name)]);
 		}
+
+		io.emit('result dice', {
+			dice1: ran1,
+			dice2: ran2,
+			sum: sum
+		});
 	});
 
 	socket.on('resource add', function(msg){
 		socket.emit('add resource', change_rate[(Usr(socket.name))]);
+		console.log(Usr(socket.name));
+		console.log(change_rate);
 	});
 
 	// --------------------------
